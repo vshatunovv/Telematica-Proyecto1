@@ -85,7 +85,7 @@ def escribir_log(log_file, mensaje, query="", response_ip=""):
 if __name__ == "__main__":
     # Verificar los argumentos de línea de comandos
     if len(sys.argv) != 5:
-        print("Uso: python3 dnscliente.py <ip_servidor> <tipo_registro> <nombre_dominio> logdns.txt")
+        print("Uso: python3 DNSCLIENTE.py <ip_servidor> <tipo_registro> <nombre_dominio> logdns.txt")
         sys.exit(1)
 
     # Obtener los argumentos de línea de comandos
