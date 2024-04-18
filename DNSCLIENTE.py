@@ -10,7 +10,7 @@ def registrar_log(log_file, query, response_ip):
 
 def main():
     if len(sys.argv) != 2:
-        print("Uso: python DNSCLIENTE.py </path/log.log>")
+        print("Uso: python3 DNSCLIENTE.py </path/log.log>")
         sys.exit(1)
 
     log_file = sys.argv[1]
