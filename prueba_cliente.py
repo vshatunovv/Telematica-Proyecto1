@@ -31,11 +31,8 @@ def main():
 
         print("Respuesta del servidor DNS:", response)
         
-        # Extraer la dirección IP de la respuesta
-        response_ip = response.decode()
-
         # Registrar la transacción en el archivo de log del cliente
-        registrar_log(log_file, query, response_ip)
+        registrar_log(log_file, query, response)
     except Exception as e:
         print("Error:", e)
     finally:
@@ -44,3 +41,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
