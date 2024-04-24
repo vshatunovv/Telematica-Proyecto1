@@ -1,18 +1,40 @@
-// dns_servidor.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <netdb.h> // Para getaddrinfo
+#include <sys/types.h>
+#include <sys/socket.h>
 
 #define MAXLINE 1024
 
 void manejar_peticion(char *query, char *client_ip, char *log_file) {
-    // Aquí puedes procesar el nombre de dominio recibido y generar la respuesta DNS adecuada
-    // Por simplicidad, este ejemplo simplemente devuelve una dirección IP de ejemplo
-    char *response_ip = "192.0.2.1";
-    
+    struct addrinfo hints, *res, *p;
+    int status;
+    char ipstr[INET6_ADDRSTRLEN];
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_INET; // AF_INET para IPv4 o AF_INET6 para IPv6
+    hints.ai_socktype = SOCK_STREAM;
+
+    if ((status = getaddrinfo(query, NULL, &hints, &res)) != 0) {
+        fprintf(stderr, "Error al resolver el nombre de dominio: %s\n", gai_strerror(status));
+        return;
+    }
+
+    for(p = res; p != NULL; p = p->ai_next) {
+        void *addr;
+        struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
+        addr = &(ipv4->sin_addr);
+
+        // Convertir la dirección IP a una cadena y guardarla en ipstr
+        inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
+    }
+
+    freeaddrinfo(res); // liberar la lista enlazada
+
     // Obtener la fecha y hora actual
     time_t rawtime;
     struct tm *timeinfo;
@@ -24,7 +46,7 @@ void manejar_peticion(char *query, char *client_ip, char *log_file) {
     // Registrar la transacción en el archivo de log
     FILE *log = fopen(log_file, "a");
     if (log != NULL) {
-        fprintf(log, "%s %s %s %s\n", timestamp, client_ip, query, response_ip);
+        fprintf(log, "%s %s %s %s\n", timestamp, client_ip, query, ipstr);
         fclose(log);
     } else {
         printf("Error al abrir el archivo de log\n");
@@ -76,9 +98,9 @@ int main(int argc, char *argv[]) {
         // Procesar la petición del cliente
         manejar_peticion(buffer, inet_ntoa(cliaddr.sin_addr), log_file);
         
-        // Simplemente devolvemos una respuesta de ejemplo
-        char *response_ip = "192.0.2.1";
-        sendto(sockfd, (const char *)response_ip, strlen(response_ip), MSG_CONFIRM, (const struct sockaddr *)&cliaddr, len);
+        // Enviar la respuesta al cliente
+        // Aquí necesitas determinar qué enviar como respuesta. ¿Quizás un mensaje de confirmación?
+        //sendto(sockfd, (const char *)response_ip, strlen(response_ip), MSG_CONFIRM, (const struct sockaddr *)&cliaddr, len);
     }
 
     close(sockfd);
