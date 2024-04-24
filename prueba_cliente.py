@@ -35,10 +35,12 @@ def main():
         # Recibir la respuesta del servidor
         response, server = sockfd.recvfrom(1024)
 
-        print("Respuesta del servidor DNS:", response)
+        print("Respuesta del servidor DNS (bytes):", response)
         
         # Convertir los bytes de la respuesta a una dirección IP legible
         response_ip = parse_ip_address(response)
+        
+        print("Respuesta del servidor DNS (IP):", response_ip)
         
         # Registrar la transacción en el archivo de log del cliente
         registrar_log(log_file, query, response_ip)
@@ -50,4 +52,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
